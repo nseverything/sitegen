@@ -2,6 +2,7 @@ from jinja2 import Environment, FileSystemLoader
 import os
 from distutils.dir_util import copy_tree
 import ftplib
+from shutil import rmtree
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -116,6 +117,8 @@ to send to FTP server
 def copy_assets(root_dir, menu_items, contents_dir):
     assets_dir = os.path.join(root_dir, ASSETS)
     output_dir = os.path.join(root_dir, OUTPUT_DIR)
+
+    rmtree(output_dir)
     copy_tree(assets_dir, output_dir)
 
     images_dir = os.path.join(output_dir, IMAGES)
@@ -159,11 +162,11 @@ if __name__ == "__main__":
     menu_data = load_names(contents_dir)
     print("Reading menu done..,")
 
-    render_templates(env, contents_dir, menu_data)
-    print("Render done....")
-
     copy_assets(root, menu_data.values(), contents_dir)
     print("Assets coping done...")
+
+    render_templates(env, contents_dir, menu_data)
+    print("Render done....")
 
     # ftp_upload(root)
     # print("FTP Upload done...")
