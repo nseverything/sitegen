@@ -19,6 +19,12 @@ CONTACT = "contact.html"
 HEADER = "header.html"
 CONTACT_DIR = "_contact"
 
+def output_dir_exists(root_dir):
+    output = os.path.join(root_dir, OUTPUT_DIR)
+    if os.path.exists(output) and os.path.isdir(output):
+        return True
+    return False
+
 def copy(from_path, to_path):
     copy_tree(from_path, to_path)
 
@@ -186,6 +192,12 @@ if __name__ == "__main__":
     root = os.path.dirname(os.path.abspath(__file__))
     templates_dir = os.path.join(root, TEMPLATES)
     env = Environment(loader = FileSystemLoader(templates_dir))
+
+    # Test is there output dirname
+    if not output_dir_exists(root):
+        print("Output folder does not exits, create one...")
+        output = os.path.join(root, OUTPUT_DIR)
+        os.makedirs(output)
 
     # Clear previous content of output folder
     clear_output(root)
