@@ -1,0 +1,49 @@
+{% extends 'header.html' %}
+{% block content %}
+
+<!-- Container (Contact Section) -->
+<div id="contact" class="container-fluid bg-grey">
+   <h2 class="text-center">Kontakt</h2>
+   <div class="row">
+      <div class="col-sm-5">
+         <p>
+         <p> Ukoliko imate neka pitanja možete me kontaktirati na mail: biljina.svastaonica@gmail.com </p>
+         <p> Ili preko poruka na Facebooku ili Instagramu.
+         <p>
+         <p> Moje radove možete pogledati u Novom Sadu i deo radova u Beogradu.</p>
+         <p>&nbsp;</p>
+         </p>
+      </div>
+      <div class="col-sm-7 slideanim">
+         <form method="post" id="kontakt" role="form" >
+            <div class="row">
+               <div class="col-sm-6 form-group">
+                  <input class="form-control" id="name" name="name" placeholder="Ime" type="text" required>
+               </div>
+               <div class="col-sm-6 form-group">
+                  <input class="form-control" id="email" name="email" placeholder="Email" type="email" required>
+               </div>
+            </div>
+            <textarea class="form-control" id="comments" name="comments" placeholder="Komentar" rows="5"></textarea>
+            <br>
+            <div class="row">
+               <div class="col-sm-12 form-group">
+                  <button class="btn btn-default pull-right" type="submit">Posalji</button>
+               </div>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+<!-- Container (Portfolio Section) -->
+<div id="contact" class="container-fluid bg-grey">
+    <div class="row">
+        {% for contact in contacts %}
+            {{contact}}
+        {% endfor %}
+   </div>
+   <br>
+</div>
+
+
+{% endblock %}
