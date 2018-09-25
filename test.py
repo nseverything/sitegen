@@ -51,7 +51,7 @@ def create_lists(item, item_images, item_texts):
 
     texts = []
     for item_text in os.listdir(item_texts):
-        texts.append(read_file(os.path.join(item_texts, item_text)))
+        texts.append(os.path.join(item_texts, item_text))
 
     images.sort()
     texts.sort()
@@ -67,12 +67,14 @@ def create_item_path(item_path):
     item_texts = os.path.join(item_path, TEXT)
     return item_images, item_texts
 
-def generate_generic_page(filename, template, data, menu_data):
+def generate_generic_page(filename, template, data, menu_data, w, h):
     with open(filename, "w") as f:
         f.write(
             template.render(
                 payload = data,
                 menu = menu_data,
+                width = w,
+                height = h,
             ).encode( "utf-8" )
         )
 
@@ -107,7 +109,7 @@ def create_menu(items):
 def create_data(images, texts):
     data = {}
     for image, text in zip(images, texts):
-        data[image] = text
+        data[image] = read_file(text)
     return data
 
 def create_html(root_dir, name):
@@ -123,6 +125,10 @@ def filter(item):
         return False
     return True
 
+def get_dimen(item):
+    w, h = item.split("x")
+    return w, h
+
 def read_content(root_dir, env, template):
     contents_dir, output_dir = create_path(root_dir)
     output_images = os.path.join(output_dir, IMAGES)
@@ -133,14 +139,15 @@ def read_content(root_dir, env, template):
         item_path = os.path.join(contents_dir, item)
         item_images, item_texts = create_item_path(item_path)
         images, texts = create_lists(item, item_images, item_texts)
-        data = create_data(images, texts)
+        data = create_data(images, texts[1:])
+        width, height = get_dimen(texts[0])
 
         # create name
         name = ".".join([item, HTML])
 
         # generate single page
         print("Genereting {} ".format(name))
-        generate_generic_page(create_html(root_dir, name), template, data, menu)
+        generate_generic_page(create_html(root_dir, name), template, data, menu, width, height)
         print("Generating {} done...".format(name))
 
         # copy single item data
