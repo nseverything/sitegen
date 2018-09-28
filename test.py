@@ -46,16 +46,21 @@ def read_file(path, mode='r'):
 
 def create_lists(item, item_images, item_texts):
     images = []
-    for item_image in os.listdir(item_images):
-        images.append(image_path(item, item_image))
+    for idx, item_image in enumerate(os.listdir(item_images)):
+        if idx > 0:
+            images.append(image_path(item, item_image))
+        else:
+            images.append(item_image)
 
     texts = []
     for item_text in os.listdir(item_texts):
-        texts.append(os.path.join(item_texts, item_text))
+        if not item_text.startswith("."):
+            texts.append(os.path.join(item_texts, item_text))
 
     images.sort()
     texts.sort()
-    return images, texts
+
+    return images[1:], texts, images[0]
 
 def create_path(root_dir):
     contents_dir = os.path.join(root_dir, CONTENT)
@@ -67,14 +72,12 @@ def create_item_path(item_path):
     item_texts = os.path.join(item_path, TEXT)
     return item_images, item_texts
 
-def generate_generic_page(filename, template, data, menu_data, w, h):
+def generate_generic_page(filename, template, data, menu_data):
     with open(filename, "w") as f:
         f.write(
             template.render(
                 payload = data,
                 menu = menu_data,
-                width = w,
-                height = h,
             ).encode( "utf-8" )
         )
 
@@ -106,10 +109,10 @@ def create_menu(items):
 
     return menu
 
-def create_data(images, texts):
+def create_data(images, texts, sizes):
     data = {}
-    for image, text in zip(images, texts):
-        data[image] = read_file(text)
+    for image, text, size in zip(images, texts, sizes):
+        data[image] = [read_file(text), size]
     return data
 
 def create_html(root_dir, name):
@@ -125,9 +128,19 @@ def filter(item):
         return False
     return True
 
-def get_dimen(item):
+def get_dimens(item):
     w, h = item.split("x")
-    return w, h
+    return [w.strip(), h.strip()]
+
+def prepare_size(item):
+    return get_dimens(item.split(":")[1])
+
+def create_dimens(size, item_path):
+    filename = os.path.join(item_path, size)
+    with open(filename, 'r') as f:
+        data = f.readlines()
+        data.sort()
+        return [prepare_size(i) for i in data]
 
 def read_content(root_dir, env, template):
     contents_dir, output_dir = create_path(root_dir)
@@ -138,16 +151,16 @@ def read_content(root_dir, env, template):
     for item in items:
         item_path = os.path.join(contents_dir, item)
         item_images, item_texts = create_item_path(item_path)
-        images, texts = create_lists(item, item_images, item_texts)
-        data = create_data(images, texts[1:])
-        width, height = get_dimen(texts[0])
+        images, texts, size = create_lists(item, item_images, item_texts)
+        sizes = create_dimens(size, item_images)
+        data = create_data(images, texts, sizes)
 
         # create name
         name = ".".join([item, HTML])
 
         # generate single page
         print("Genereting {} ".format(name))
-        generate_generic_page(create_html(root_dir, name), template, data, menu, width, height)
+        generate_generic_page(create_html(root_dir, name), template, data, menu)
         print("Generating {} done...".format(name))
 
         # copy single item data

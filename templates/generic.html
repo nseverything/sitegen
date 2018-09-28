@@ -4,8 +4,8 @@
 {% for key, value in payload.items() %}
 <div class="gallery">
     <a target="_blank" href="{{key}}">
-        <img src="{{key}}" width="{{width}}" height="{{height}}" alt="t1" />
-        <div class="desc">{{value}}</div>
+        <img src="{{key}}" width="{{value[1][0]}}" height="{{value[1][1]}}" alt="t1" />
+        <div class="desc">{{value[0]}}</div>
     </a>
 </div>
 {% endfor %}
